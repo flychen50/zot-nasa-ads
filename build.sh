@@ -1,7 +1,16 @@
 #!/bin/bash
 
 # Zot-NASA-ADS打包脚本
-# 使用方法: 在终端中运行 ./build.sh
+# 使用方法: 
+# 1. 打包插件: ./build.sh
+# 2. 运行测试: ./build.sh test
+
+# 检查命令行参数
+if [ "$1" == "test" ]; then
+    echo "运行单元测试..."
+    node test/run-tests.js
+    exit $?
+fi
 
 # 获取版本号
 VERSION=$(grep -o '"version": "[^"]*"' manifest.json | cut -d'"' -f4)

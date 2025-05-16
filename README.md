@@ -76,3 +76,118 @@ This Zotero plugin allows one to update the Zotero metadata, download a publishe
 ## License
 
 Distributed under version 3 of the GNU Affero General Public License (AGPL).
+
+## 开发与测试
+
+### 开发环境设置
+如果您想为此项目贡献代码，请按照以下步骤设置开发环境：
+
+1. 克隆此仓库到本地：
+   ```
+   git clone https://github.com/samuelyeewl/zot-nasa-ads.git
+   cd zot-nasa-ads
+   ```
+
+2. 在Zotero中加载开发版本：
+   - 使用符号链接将项目目录链接到Zotero扩展目录
+   - 或使用`build.sh`脚本创建安装文件并手动加载
+
+### 单元测试框架
+插件包含完整的单元测试框架，使用纯JavaScript实现，不依赖外部测试库。测试框架包括：
+
+1. **测试设置模拟（test-setup.js）**：
+   - 模拟Zotero API环境
+   - 提供MockZoteroItem、MockDocument和MockElement等模拟类
+   - 模拟HTTP请求和响应
+
+2. **测试辅助工具（test-helpers.js）**：
+   - 提供断言库（Assert）用于验证结果
+   - 提供测试运行器用于执行测试套件
+
+3. **测试运行器（run-tests.js）**：
+   - 自动发现和运行test目录中的所有测试文件
+   - 生成测试报告，显示通过和失败的测试
+
+### 运行单元测试
+执行以下命令运行所有测试：
+```
+./build.sh test
+```
+
+测试运行器将自动发现并执行test目录下所有以"test-"开头并以".js"结尾的文件（除test-setup.js和test-helpers.js外）。
+
+### 当前测试套件
+测试套件覆盖插件的主要功能：
+
+1. **初始化测试（test-init.js）**：
+   - 验证插件能正确初始化
+   - 测试重复初始化的行为
+   - 验证元素记录功能
+   - 测试日志记录功能
+
+2. **元数据更新测试（test-metadata-update.js）**：
+   - 测试没有选定项时的错误处理
+   - 验证项目没有DOI时的错误处理
+   - 测试元数据更新功能
+   - 验证API错误的处理
+   - 测试没有结果时的错误处理
+
+3. **UI元素测试（test-ui-elements.js）**：
+   - 测试向窗口添加UI元素
+   - 验证从窗口移除UI元素
+   - 测试菜单项点击响应
+   - 验证DOM元素创建功能
+   - 测试多窗口环境中的UI处理
+
+### 添加新测试
+要添加新的测试：
+
+1. 在`test`目录创建新的测试文件，命名为`test-[功能名].js`
+2. 导入测试设置和辅助函数：
+   ```javascript
+   const { Zotero, Services, MockZoteroItem } = require('./test-setup');
+   const { Assert, runTestSuite } = require('./test-helpers');
+   ```
+
+3. 设置全局变量并加载插件代码：
+   ```javascript
+   global.Zotero = Zotero;
+   global.Services = Services;
+   ```
+
+4. 创建测试套件：
+   ```javascript
+   runTestSuite('测试套件名称', {
+       '测试用例1': function() {
+           // 编写测试代码
+           Assert.ok(true, '测试成功');
+       },
+       '测试用例2': async function() {
+           // 异步测试代码
+           const result = await someAsyncFunction();
+           Assert.equal(result, expectedValue, '结果应该匹配');
+       }
+   });
+   ```
+
+5. 运行测试验证结果：
+   ```
+   ./build.sh test
+   ```
+
+### 测试最佳实践
+1. **独立测试**：每个测试应该独立运行，不依赖其他测试的执行结果
+2. **模拟外部依赖**：对外部API调用使用模拟响应
+3. **清理状态**：每个测试结束后恢复修改过的函数和状态
+4. **明确断言消息**：为每个断言提供清晰的错误消息
+5. **测试错误情况**：不仅测试正常路径，还要测试错误处理
+
+### 调试测试
+如果测试失败，测试运行器会显示详细的错误信息和堆栈跟踪。您可以：
+
+1. 在测试代码中添加`console.log()`语句输出调试信息
+2. 修改`test-helpers.js`中的断言函数以提供更详细的错误信息
+3. 单独运行特定测试文件：`node test/test-specific-file.js`
+
+### 持续集成
+欢迎贡献者为此项目添加CI工作流，例如GitHub Actions，以自动运行测试并确保代码质量。
